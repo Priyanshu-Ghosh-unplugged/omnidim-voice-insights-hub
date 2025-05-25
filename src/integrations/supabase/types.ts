@@ -9,7 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      conversations: {
+        Row: {
+          bot_response: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          price: number | null
+          updated_at: string
+          user_id: string | null
+          user_input: string
+        }
+        Insert: {
+          bot_response: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          price?: number | null
+          updated_at?: string
+          user_id?: string | null
+          user_input: string
+        }
+        Update: {
+          bot_response?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          price?: number | null
+          updated_at?: string
+          user_id?: string | null
+          user_input?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          email_address: string | null
+          gmail_api_key: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_address?: string | null
+          gmail_api_key?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_address?: string | null
+          gmail_api_key?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
