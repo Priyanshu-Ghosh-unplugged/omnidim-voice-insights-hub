@@ -6,9 +6,9 @@ A powerful web application that helps users compare sneaker prices across multip
 
 Visit our live application at: [https://omnidim-voice-insights-hub.lovable.app/](https://omnidim-voice-insights-hub.lovable.app/)
 
-\n Use the following admin details:
-\n Email: admin@myapp.in
-\n Password: admin123
+<br> Use the following admin details:
+<br> Email: admin@myapp.in
+<br> Password: admin123
 
 ## ✨ Features
 
