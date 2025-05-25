@@ -55,6 +55,8 @@ Visit our live application at: [https://omnidim-voice-insights-hub.lovable.app/]
    ```env
    VITE_API_URL=your_api_url
    VITE_OMNIDIM_SECRET_KEY=your_secret_key
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
 4. Start the development server:
@@ -120,6 +122,8 @@ omnidim-voice-insights-hub/
 Required environment variables:
 - `VITE_API_URL`: Your API endpoint
 - `VITE_OMNIDIM_SECRET_KEY`: Secret key for Omnidim voice agent
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
 ## 📚 Documentation
 
