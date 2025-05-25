@@ -29,7 +29,6 @@ import DataAnalytics from '@/components/DataAnalytics';
 import AutomationSettings from '@/components/AutomationSettings';
 import SecurityPanel from '@/components/SecurityPanel';
 import DocumentationPanel from '@/components/DocumentationPanel';
-import EmailSubscription from '@/components/EmailSubscription';
 
 const Index = () => {
   const [isVoiceAgentActive, setIsVoiceAgentActive] = useState(false);
@@ -141,7 +140,6 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <EmailSubscription />
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-purple-200" />
                 <span className="text-sm text-purple-200">{user.email}</span>
