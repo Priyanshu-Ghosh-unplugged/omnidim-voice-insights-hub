@@ -2,14 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { MessageSquare, Send, TrendingUp, Clock, DollarSign } from 'lucide-react';
+import { MessageSquare, TrendingUp, Clock, DollarSign, Activity } from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -21,19 +18,17 @@ interface Conversation {
 }
 
 const ConversationLogger = () => {
-  const [userInput, setUserInput] = useState('');
-  const [botResponse, setBotResponse] = useState('');
-  const [price, setPrice] = useState('0.00');
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortByPrice, setSortByPrice] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const { user } = useAuth();
 
   // Fetch conversations on component mount
   useEffect(() => {
     if (user) {
       fetchConversations();
+      startBotChatListener();
     }
   }, [user, sortByPrice]);
 
@@ -58,12 +53,107 @@ const ConversationLogger = () => {
     }
   };
 
-  const logConversation = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const startBotChatListener = () => {
     if (!user) return;
 
-    setLoading(true);
-    setError(null);
+    setIsListening(true);
+    
+    // Listen for Omnidim voice agent events
+    const checkForOmnidimEvents = () => {
+      if (window.omnidim) {
+        console.log('Omnidim voice agent detected, setting up listeners');
+        
+        // Override or listen to Omnidim events if available
+        if (window.omnidim.onConversation) {
+          const originalHandler = window.omnidim.onConversation;
+          window.omnidim.onConversation = (data: any) => {
+            console.log('Captured conversation data:', data);
+            logBotConversation(data.userInput, data.botResponse, data.price || 0.01);
+            if (originalHandler) originalHandler(data);
+          };
+        }
+      }
+    };
+
+    // Check for widget events via DOM mutations or custom events
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              // Look for chat messages in the Omnidim widget
+              if (element.matches('[class*="chat"], [class*="message"], [id*="omnidim"]') ||
+                  element.querySelector('[class*="chat"], [class*="message"]')) {
+                console.log('Detected chat activity');
+                extractConversationFromDOM();
+              }
+            }
+          });
+        }
+      });
+    });
+
+    // Observe the entire document for chat widget changes
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Listen for custom events that might be dispatched by the chat widget
+    const handleChatEvent = (event: any) => {
+      console.log('Chat event detected:', event.detail);
+      if (event.detail?.userMessage && event.detail?.botResponse) {
+        logBotConversation(
+          event.detail.userMessage,
+          event.detail.botResponse,
+          event.detail.price || 0.01
+        );
+      }
+    };
+
+    document.addEventListener('omnidim-conversation', handleChatEvent);
+    document.addEventListener('chat-message', handleChatEvent);
+
+    // Try to detect existing chat elements
+    setTimeout(checkForOmnidimEvents, 2000);
+
+    // Cleanup function
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('omnidim-conversation', handleChatEvent);
+      document.removeEventListener('chat-message', handleChatEvent);
+    };
+  };
+
+  const extractConversationFromDOM = () => {
+    // Try to extract conversation data from DOM elements
+    const chatElements = document.querySelectorAll('[class*="chat"], [class*="message"], [data-chat]');
+    
+    chatElements.forEach(element => {
+      const textContent = element.textContent || '';
+      if (textContent.length > 10) {
+        // Simple heuristic to detect user vs bot messages
+        const isUserMessage = element.className.includes('user') || 
+                             element.getAttribute('data-role') === 'user';
+        
+        if (isUserMessage) {
+          // Store user message temporarily
+          sessionStorage.setItem('lastUserMessage', textContent);
+        } else {
+          // This might be a bot response
+          const lastUserMessage = sessionStorage.getItem('lastUserMessage');
+          if (lastUserMessage && lastUserMessage !== textContent) {
+            logBotConversation(lastUserMessage, textContent, 0.01);
+            sessionStorage.removeItem('lastUserMessage');
+          }
+        }
+      }
+    });
+  };
+
+  const logBotConversation = async (userInput: string, botResponse: string, price: number = 0.01) => {
+    if (!user || !userInput || !botResponse) return;
 
     try {
       const { error } = await supabase
@@ -73,27 +163,24 @@ const ConversationLogger = () => {
             user_id: user.id,
             user_input: userInput,
             bot_response: botResponse,
-            price: parseFloat(price),
+            price: price,
             metadata: {
               timestamp: new Date().toISOString(),
-              user_agent: navigator.userAgent
+              source: 'omnidim_voice_agent',
+              user_agent: navigator.userAgent,
+              auto_logged: true
             }
           }
         ]);
 
       if (error) throw error;
-
-      // Clear form
-      setUserInput('');
-      setBotResponse('');
-      setPrice('0.00');
-
+      
+      console.log('Conversation logged successfully');
       // Refresh conversations
       fetchConversations();
     } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      console.error('Failed to log conversation:', error);
+      setError(`Failed to log conversation: ${error.message}`);
     }
   };
 
@@ -105,59 +192,27 @@ const ConversationLogger = () => {
 
   return (
     <div className="space-y-6">
-      {/* Logging Form */}
+      {/* Auto-logging Status */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
-            Log New Conversation
+            <Activity className="w-5 h-5" />
+            Automatic Bot Chat Logging
           </CardTitle>
           <CardDescription>
-            Record chatbot interactions with pricing information
+            Automatically capturing conversations from the Omnidim voice agent
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={logConversation} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">User Input</label>
-              <Textarea
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Enter user's message..."
-                required
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Bot Response</label>
-              <Textarea
-                value={botResponse}
-                onChange={(e) => setBotResponse(e.target.value)}
-                placeholder="Enter bot's response..."
-                required
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Price (USD)</label>
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="0.00"
-                className="mt-1"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Price represents the cost of processing this conversation (API calls, compute time, etc.)
-              </p>
-            </div>
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Logging...' : 'Log Conversation'}
-              <Send className="w-4 h-4 ml-2" />
-            </Button>
-          </form>
+          <div className="flex items-center gap-4">
+            <Badge variant={isListening ? "default" : "secondary"} className="px-3 py-1">
+              <Activity className="w-3 h-3 mr-1" />
+              {isListening ? "Listening for Chats" : "Not Active"}
+            </Badge>
+            <p className="text-sm text-gray-600">
+              The system is monitoring for chat interactions and automatically logging them to the database.
+            </p>
+          </div>
 
           {error && (
             <Alert className="mt-4 border-red-200 bg-red-50">
@@ -204,7 +259,7 @@ const ConversationLogger = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Conversation History</CardTitle>
+            <CardTitle>Auto-Logged Conversations</CardTitle>
             <Button
               variant="outline"
               size="sm"
@@ -228,6 +283,11 @@ const ConversationLogger = () => {
                     <span className="text-sm text-gray-600">
                       {formatDate(conversation.created_at)}
                     </span>
+                    {conversation.metadata?.auto_logged && (
+                      <Badge variant="outline" className="text-xs">
+                        Auto-logged
+                      </Badge>
+                    )}
                   </div>
                   <Badge variant="secondary">
                     ${conversation.price.toFixed(2)}
@@ -247,7 +307,7 @@ const ConversationLogger = () => {
             ))}
             {conversations.length === 0 && (
               <div className="text-center py-8 text-gray-500">
-                No conversations logged yet. Start by logging your first conversation above.
+                No conversations logged yet. Start a chat with the voice agent to see data here.
               </div>
             )}
           </div>
