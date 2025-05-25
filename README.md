@@ -1,73 +1,149 @@
-# Welcome to your Lovable project
+# Sneakers Price Comparison Bot
 
-## Project info
+A powerful web application that helps users compare sneaker prices across multiple platforms, track price history, and get notified of the best deals. Built with modern web technologies and a beautiful dark-themed UI.
 
-**URL**: https://lovable.dev/projects/b8b2d9cc-1e92-475d-aae9-616aaa5d255f
+## 🌐 Live Demo
 
-## How can I edit this code?
+Visit our live application at: [https://omnidim-voice-insights-hub.lovable.app/](https://omnidim-voice-insights-hub.lovable.app/)
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- **Price Comparison**: Compare sneaker prices across multiple platforms
+- **Price History Tracking**: Monitor price changes over time
+- **Deal Notifications**: Get notified when prices drop
+- **Voice Agent Integration**: Interactive voice commands for price queries
+- **Email Reports**: Receive detailed price analysis via email
+- **Analytics Dashboard**: Visualize price trends and market data
+- **Security Features**: Secure authentication and data protection
+- **Automation Tools**: Set up automated price monitoring
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b8b2d9cc-1e92-475d-aae9-616aaa5d255f) and start prompting.
+## 🛠️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Custom UI components with shadcn/ui
+- **State Management**: React Query
+- **Routing**: React Router
+- **Authentication**: Custom auth system
+- **Icons**: Lucide React
+- **Voice Integration**: Omnidim Voice Agent
 
-**Use your preferred IDE**
+## 🚀 Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js (v16 or higher)
+- npm or yarn
+- Git
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/omnidim-voice-insights-hub.git
+   cd omnidim-voice-insights-hub
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Create a `.env` file in the root directory and add your environment variables:
+   ```env
+   VITE_API_URL=your_api_url
+   VITE_OMNIDIM_SECRET_KEY=your_secret_key
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+4. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+The application will be available at `http://localhost:5173`
+
+## 📝 Contributing
+
+We welcome contributions! Please follow these steps to contribute:
+
+1. Fork the repository
+2. Create a new branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. Make your changes and commit them:
+   ```bash
+   git add .
+   git commit -m "feat: description of your changes"
+   ```
+
+4. Push to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+5. Create a Pull Request
+
+### Commit Guidelines
+
+We follow conventional commits format:
+- `feat:` for new features
+- `fix:` for bug fixes
+- `docs:` for documentation changes
+- `style:` for formatting changes
+- `refactor:` for code refactoring
+- `test:` for adding tests
+- `chore:` for maintenance tasks
+
+## 🔧 Project Structure
+
+```
+omnidim-voice-insights-hub/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── pages/         # Page components
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utility functions
+│   ├── types/         # TypeScript type definitions
+│   └── integrations/  # Third-party integrations
+├── public/            # Static assets
+└── tests/            # Test files
 ```
 
-**Edit a file directly in GitHub**
+## 🔐 Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Required environment variables:
+- `VITE_API_URL`: Your API endpoint
+- `VITE_OMNIDIM_SECRET_KEY`: Secret key for Omnidim voice agent
 
-**Use GitHub Codespaces**
+## 📚 Documentation
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+For detailed documentation about specific features and components, please refer to the following:
 
-## What technologies are used for this project?
+- [Voice Agent Integration](./docs/voice-agent.md)
+- [Price Comparison API](./docs/api.md)
+- [Authentication System](./docs/auth.md)
+- [Email Reports](./docs/email-reports.md)
 
-This project is built with:
+## 🤝 Support
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+If you encounter any issues or have questions, please:
 
-## How can I deploy this project?
+1. Check the [documentation](./docs)
+2. Search for existing issues
+3. Create a new issue with detailed information
 
-Simply open [Lovable](https://lovable.dev/projects/b8b2d9cc-1e92-475d-aae9-616aaa5d255f) and click on Share -> Publish.
+## 📄 License
 
-## Can I connect a custom domain to my Lovable project?
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Yes, you can!
+## 🙏 Acknowledgments
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
+- [Tailwind CSS](https://tailwindcss.com/) for the styling framework
+- [Omnidim](https://omnidim.io) for the voice agent integration
